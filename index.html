@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新発田市地区別人口推移</title>
+<script>
+//2016年～2023年 データ出典「町丁目字別人口、世帯数」(新発田市）（https://www.city.shibata.lg.jp/machidukuri/opendata/1006291.html）
+var jinkou = [
+    [53217,53198,53031,52926,52799,52841,52551,52120], //本庁地区
+    [5595,5527,5460,5349,5247,5125,5073,5064], //五十公野地区
+    [2132,2069,2002,1942,1881,1844,1803,1751], //松浦地区
+    [1151,1128,1089,1072,1051,1022,979,931], //米倉地区
+    [403,394,383,370,358,344,323,308], //赤谷地区
+    [4708,4632,4560,4488,4346,4257,4159,4048], //川東地区
+    [3184,3089,3014,2929,2866,2794,2702,2591], //菅谷地区
+    [3458,3441,3402,3341,3302,3258,3208,3161], //加治地区
+    [3671,3655,3571,3529,3494,3387,3291,3225], //佐々木地区
+    [8767,8660,8665,8599,8485,8371,8241,8185], //豊浦地区
+    [7302,7251,7128,7000,6856,6721,6624,6519], //紫雲寺地区
+    [6295,6235,6146,6047,5930,5813,5696,5560] //加治川地区
+] 
+var chikuname = ['本庁地区','五十公野地区','松浦地区','米倉地区','赤谷地区','川東地区','菅谷地区','加治地区','佐々木地区','豊浦地区','紫雲寺地区','加治川地区']
+function draw(target) {
+    //canvas要素を取得
+    var canvas = document.getElementById('tutorial');
+    if (canvas.getContext) {
+        //変数ctxにペンの機能を持たせる
+        var ctx = canvas.getContext('2d');
+        //重ならないように全部消す
+        ctx.clearRect(0,0,350,350);        
+        var x = 20 + 320 / 7;
+        var y = 10;
+        var ratio = 100;
+        var year = 2016;
+        //線の太さを決める
+        ctx.lineWidth = 1;
+        //線の色を決める
+        ctx.strokeStyle = "hsl(0,0%,0%,100%)";
+        //ここからパスを始める
+        ctx.beginPath();
+        //指定した座標(20,10)まで移動する
+        ctx.moveTo(20,10);
+        //指定した座標(20,330)まで移動する
+        ctx.lineTo(20,330);
+        ctx.lineTo(340,330);
+        //パスを終わる
+        ctx.stroke();
+        ctx.strokeStyle = "hsl(0,0%,75%,100%)";
+        ctx.beginPath();
+        //グラフの横の線を引いている
+        for (let i = 0; i < 6; i++){
+            ctx.moveTo(20,y);
+            ctx.lineTo(340,y);
+            y += 320 / 6;
+        }
+        //
+        for (let i = 0; i < 7; i++) {
+            ctx.moveTo(x,10);
+            ctx.lineTo(x,330);
+            x += 320 / 7;
+        }
+        y = 10;
+        ctx.stroke();
+        ctx.font = '9px sans-serif';
+        //数値をいれている
+        for (let i = 0; i < 7; i++) {
+            ctx.fillText(ratio, 0, y);
+            ratio -= 5;
+            y += 320 / 6;
+        }
+        x = 0;
+        for (let i = 0; i < 8; i++) {
+            ctx.fillText(year + '/4', x, 343);
+            year += 1;
+            x += 320 / 7;
+        }
+        //左に今選択しているものを表示する
+        ctx.font = '17px sans-serif';
+        ctx.fillText(chikuname[target],50,180);
+        //2016年から何パーセント減ったかを計算しMath.roundで四捨五入して表示する
+        ctx.fillText(Math.round((100 - (jinkou[target][7] / jinkou[target][0] * 100)) * 10) / 10 + '%減',50,200);
+        ctx.fillText('2016年 ' + jinkou[target][0] + '人',50,220);
+        ctx.fillText('2023年 ' + jinkou[target][7] + '人',50,240);
+        ctx.font = '13px sans-serif';
+        ctx.fillText('2016年4月を基準(100)とする',160,320);
+        var c = 0;
+        var d = 0;
+        var color = 0;
+        //折れ線グラフを描いている
+        for (var i = 0; i < 12; i++) {
+            ctx.beginPath();
+            //線の位置、太さ、濃さを戻す
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "hsl(" + color + ",90%,61%,30%)";
+            ctx.moveTo(20,10);
+            x = 20;
+            for (var j = 0; j < 8; j++) {
+                if (target == i) {
+                    //targetが今書いている線だったら線を太くする
+                    ctx.strokeStyle = "hsl(" + color + ",90%,61%,100%)";
+                    ctx.lineWidth = 2;
+                }
+                //人口のi番目の表のj番目の数値と人口のi番目の表の0番目を代入して求めた座標まで線を引く
+                ctx.lineTo(x, (-320 / 30) * (jinkou[i][j] / jinkou[i][0] * 100) + 10-((-320/30)*100));
+                //x座標をずらす
+                x += 320 / 7;
+                }
+            //色を変える
+            color += 360 / 12;
+            ctx.stroke();
+        }
+    }
+}
+</script>
+<style>
+/*canvasの境界線を1pxの黒の実線で描く*/
+canvas {
+    display: block;
+    margin: auto; 
+}
+/* bodyの中身を中央に揃え、フォントをsans-selifにする */
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+/* tableの中身を中央に揃える*/
+table {
+    margin: auto;
+}
+/* tdに枠を追加する */
+td {
+    width: 175px;
+    height: 30px;
+    border: 1px solid black;
+    border-radius: 30px;
+    background-color: #fdfdfd;
+}
+/* 文字を中央にそろえる */
+h1 {
+    text-align: center;
+    font-size: 23px;
+}
+/* 文字を中央にそろえる */
+p {
+    text-align: center;
+}
+/* display: flex;で横並びにできるようにし、align-items:~ 、justify-content:~で左中央ぞろえにする*/
+.text {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+/* margin: 0 1em;で左右だけに1文字分スペースを作る。width:~ 、border-top:~で長さや太さを決めて線を入れる*/
+.text::before {
+    content: "";
+    border-top: 3px solid;
+    margin: 0 1em;
+    width: 20px;
+}
+/* 分かりやすいようにグラフの色と同じ色にする */
+#hontyou::before {
+    border-color: hsl(0,90%,61%,100%);;
+}
+#ijimino::before {
+    border-color: hsl(30,90%,61%,100%);;
+}
+#matsuura::before {
+    border-color: hsl(60,90%,61%,100%);;
+}
+#yonekura::before {
+    border-color: hsl(90,90%,61%,100%);;
+}
+#akatani::before {
+    border-color: hsl(120,90%,61%,100%);;
+}
+#kawahigashi::before {
+    border-color: hsl(150,90%,61%,100%);;
+}
+#sugatani::before {
+    border-color: hsl(180,90%,61%,100%);;
+}
+#kaji::before {
+    border-color: hsl(210,90%,61%,100%);;
+}
+#sasaki::before {
+    border-color: hsl(240,90%,61%,100%);;
+}
+#toyoura::before {
+    border-color: hsl(270,90%,61%,100%);;
+}
+#siunji::before {
+    border-color: hsl(300,90%,61%,100%);;
+}
+#kajikawa::before {
+    border-color: hsl(330,90%,61%,100%);;
+}
+</style>
+</head>
+<!--bodyがロードされたときdrowのtargetを0にする-->
+<body onload="draw(0);">
+<h1>新発田市地区別人口推移</h1>
+<p>2016年4月～2023年4月まで</p>
+<!--横360、縦350のcanvasを作る-->
+<canvas id="tutorial" width="360" height="350"></canvas>
+<p>各地区名をクリックすると太線になります</p>
+<table>
+    <!--trで行を変える-->
+    <tr>
+        <!--クリックされたときdrowのtargetを変える-->
+        <td onclick="draw(0)"><div class="text" id="hontyou">本庁地区</div></td>
+        <td onclick="draw(1)"><div class="text" id ="ijimino">五十公野地区</div></td>
+    <tr>
+        <td onclick="draw(2)"><div class="text" id="matsuura">松浦地区</div></td>
+        <td onclick="draw(3)"><div class="text" id ="yonekura">米倉地区</div></td>
+    </tr>
+    <tr>
+        <td onclick="draw(4)"><div class="text" id="akatani">赤谷地区</div></td>
+        <td onclick="draw(5)"><div class="text" id ="kawahigashi">川東地区</div></td>
+    </tr>
+    <tr>
+        <td onclick="draw(6)"><div class="text" id="sugatani">菅谷地区</div></td>
+        <td onclick="draw(7)"><div class="text" id ="kaji">加治地区</div></td>
+    </tr>
+    <tr>
+        <td onclick="draw(8)"><div class="text" id="sasaki">佐々木地区</div></td>
+        <td onclick="draw(9)"><div class="text" id ="toyoura">豊浦地区</div></td>
+    </tr>
+    <tr>
+        <td onclick="draw(10)"><div class="text" id="siunji">紫雲寺地区</div></td>
+        <td onclick="draw(11)"><div class="text" id ="kajikawa">加治川地区</div></td>
+    </tr>
+</table>
+<p><a href="https://www.city.shibata.lg.jp/machidukuri/opendata/1006291.html">「町丁目字別人口、世帯数」(新発田市)</a>を加工して作成</p>
+</body>
+</html>
